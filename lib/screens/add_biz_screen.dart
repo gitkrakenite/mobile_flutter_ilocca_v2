@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:ilocca_v2/styles/app_colors.dart';
+import 'package:image_picker/image_picker.dart';
 
 String dropdownValue = 'default';
 
@@ -11,6 +14,24 @@ class AddNewBusiness extends StatefulWidget {
 }
 
 class _AddNewBusinessState extends State<AddNewBusiness> {
+  File? _image;
+
+  // Future<void> _pickImage(ImageSource source) async {
+  //   final pickedImage = await ImagePicker().pickImage(source: source);
+
+  //   setState(() {
+  //     _image = pickedImage != null ? File(pickedImage.path) : null;
+  //   });
+  // }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedImage = await ImagePicker().pickImage(source: source);
+
+    setState(() {
+      _image = pickedImage != null ? File(pickedImage.path) : null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +40,6 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
         child: Column(
           children: [
             Card(
-              color: Colors.transparent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -41,36 +61,36 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
                       const SizedBox(
                         height: 16,
                       ),
-                      TextField(
+                      const TextField(
                         decoration: InputDecoration(
                           hintText: "business name",
                           labelText: "Please Enter Business Name",
                           labelStyle: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
+                            // color: Colors.white.withOpacity(0.4),
                             fontSize: 20,
                           ),
-                          border: const UnderlineInputBorder(
+                          border: UnderlineInputBorder(
                             borderSide: BorderSide(
-                              color: Colors.white,
-                            ),
+                                // color: Colors.white,
+                                ),
                           ),
                         ),
                       ),
                       const SizedBox(
                         height: 16,
                       ),
-                      TextField(
+                      const TextField(
                         decoration: InputDecoration(
                           hintText: "description",
                           labelText: "A description of your business",
                           labelStyle: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
+                            // color: Colors.white.withOpacity(0.4),
                             fontSize: 20,
                           ),
-                          border: const UnderlineInputBorder(
+                          border: UnderlineInputBorder(
                             borderSide: BorderSide(
-                              color: Colors.white,
-                            ),
+                                // color: Colors.white,
+                                ),
                           ),
                         ),
                       ),
@@ -84,10 +104,10 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                         child: DropdownButton(
-                          padding: EdgeInsets.all(6.0),
+                          padding: const EdgeInsets.all(6.0),
                           isExpanded: true,
                           value: dropdownValue,
-                          icon: Icon(Icons.arrow_drop_down),
+                          icon: const Icon(Icons.arrow_drop_down),
                           underline: Container(),
                           // style: TextStyle(color: Colors.white),
                           borderRadius: BorderRadius.circular(12.0),
@@ -130,10 +150,32 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
                         height: 16,
                       ),
 
+                      // Image picker button
+                      // Image picker button
+                      ElevatedButton(
+                        onPressed: () {
+                          _showImagePickerDialog();
+                        },
+                        child: Text("Pick Image"),
+                      ),
+
+                      /// Display selected image
+                      _image != null
+                          ? Image.file(
+                              _image!,
+                              height: 100,
+                              width: 100,
+                            )
+                          : Container(),
+
+                      const SizedBox(
+                        height: 16,
+                      ),
+
                       ElevatedButton(
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(Colors
-                              .transparent), // Set your desired background color
+                          // backgroundColor: MaterialStateProperty.all<Color>(Colors
+                          //     .transparent), // Set your desired background color
                           minimumSize: MaterialStateProperty.all<Size>(
                               Size(double.infinity, 0)),
                         ),
@@ -148,14 +190,13 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
                               Text(
                                 "Add New Business",
                                 style: TextStyle(
-                                  color: primaryTxtColor,
-                                ),
+                                    color: primaryTxtColor, fontSize: 20),
                               ),
                               SizedBox(
                                 width: 5,
                               ),
                               Icon(
-                                Icons.login,
+                                Icons.add,
                                 color: primaryTxtColor,
                               )
                             ],
@@ -175,5 +216,32 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
 
   void handleCreate() {
     print("create new");
+  }
+
+  Future<void> _showImagePickerDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Select Image Source"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _pickImage(ImageSource.camera);
+              },
+              child: Text("Camera"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _pickImage(ImageSource.gallery);
+              },
+              child: Text("Gallery"),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
