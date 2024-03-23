@@ -7,9 +7,16 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:ilocca_v2/styles/app_colors.dart';
 
-class LoginScreen extends StatelessWidget {
+bool showPass = false;
+
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,8 +26,8 @@ class LoginScreen extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.asset(
-                  "assets/images/iloccaBg.jpg",
+                Image.network(
+                  "https://images.pexels.com/photos/2657669/pexels-photo-2657669.jpeg?auto=compress&cs=tinysrgb&w=600",
                   fit: BoxFit
                       .cover, // This ensures the image fills the entire space
                   height: double.infinity,
@@ -34,6 +41,7 @@ class LoginScreen extends StatelessWidget {
 
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
                       width: double.infinity,
@@ -81,9 +89,10 @@ class LoginScreen extends StatelessWidget {
                                       height: 16,
                                     ),
                                     TextField(
+                                      obscureText: showPass ? false : true,
                                       decoration: InputDecoration(
                                         hintText: "password",
-                                        labelText: "Please Enter Password",
+                                        labelText: "Enter Password",
                                         labelStyle: TextStyle(
                                           color: Colors.white.withOpacity(0.4),
                                           fontSize: 20,
@@ -92,6 +101,16 @@ class LoginScreen extends StatelessWidget {
                                           borderSide: BorderSide(
                                             color: Colors.white,
                                           ),
+                                        ),
+                                        suffixIcon: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              showPass = !showPass;
+                                            });
+                                          },
+                                          icon: Icon(showPass
+                                              ? Icons.visibility_off
+                                              : Icons.visibility),
                                         ),
                                       ),
                                     ),
@@ -132,7 +151,16 @@ class LoginScreen extends StatelessWidget {
                                           ],
                                         ),
                                       ),
-                                    )
+                                    ),
+                                    Align(
+                                      alignment: Alignment.topLeft,
+                                      child: TextButton(
+                                        onPressed: () {
+                                          Get.offAndToNamed("/register");
+                                        },
+                                        child: const Text("No Account Yet"),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               )),

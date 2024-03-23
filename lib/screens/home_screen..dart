@@ -58,6 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Card(
+                      elevation: 0,
+                      color: Colors.transparent,
                       child: Padding(
                         padding: const EdgeInsets.all(14.0),
                         child: Column(
@@ -111,6 +113,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Card(
+                      color: Colors.transparent,
+                      elevation: 0,
                       child: Padding(
                         padding: const EdgeInsets.all(14.0),
                         child: Column(
@@ -164,6 +168,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Card(
+                      color: Colors.transparent,
+                      elevation: 0,
                       child: Padding(
                         padding: const EdgeInsets.all(14.0),
                         child: Column(

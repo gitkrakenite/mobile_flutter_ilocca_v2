@@ -1,7 +1,9 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:ilocca_v2/controllers/bottom_navigation.dart';
+import 'package:ilocca_v2/screens/add_biz_screen.dart';
 import 'package:ilocca_v2/screens/business_screen.dart';
 import 'package:ilocca_v2/screens/home_screen..dart';
 import 'package:ilocca_v2/styles/app_colors.dart';
@@ -10,10 +12,11 @@ import 'package:ilocca_v2/styles/app_colors.dart';
 //the order matters
 var screens = [
   HomeScreen(),
+  AddNewBusiness(),
   BusinessScreen(),
   // Center(child: Text("Profile")),
-  Center(child: Text("Innovation")),
-  Center(child: Text("Events")),
+  // Center(child: Text("Innovation")),
+  // Center(child: Text("Events")),
 ];
 
 //we access our controller
@@ -43,17 +46,22 @@ class MainWrapperScreen extends StatelessWidget {
             color: Colors.white,
           ),
           Icon(
+            Icons.add,
+            size: 30,
+            color: Colors.white,
+          ),
+          Icon(
             Icons.business,
             color: Colors.white,
           ),
-          Icon(
-            Icons.laptop,
-            color: Colors.white,
-          ),
-          Icon(
-            Icons.event,
-            color: Colors.white,
-          ),
+          // Icon(
+          //   Icons.laptop,
+          //   color: Colors.white,
+          // ),
+          // Icon(
+          //   Icons.event,
+          //   color: Colors.white,
+          // ),
         ],
         onTap: (index) {
           //we just access the updateFunction and give it index

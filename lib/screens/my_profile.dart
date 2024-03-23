@@ -74,11 +74,12 @@ class MyProfile extends StatelessWidget {
                   children: [
                     const Text(
                       "Hello Josh",
-                      style: TextStyle(color: secondaryTxtColor),
+                      style:
+                          TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
                     ),
                     IconButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, "/edit-profile");
+                        // Navigator.pushNamed(context, "/edit-profile");
                       },
                       icon: const Icon(Icons.edit, color: primaryTxtColor),
                     )
@@ -87,10 +88,10 @@ class MyProfile extends StatelessWidget {
                 const SizedBox(
                   height: 25,
                 ),
-                Text(
-                  "You have three businesses",
+                const Text(
+                  "You have three events",
                   style: TextStyle(
-                      color: secondaryTxtColor.withOpacity(0.8),
+                      // color: secondaryTxtColor.withOpacity(0.8),
                       fontWeight: FontWeight.bold,
                       fontSize: 20),
                 ),
