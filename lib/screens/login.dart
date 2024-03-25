@@ -2,12 +2,11 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:get/get.dart';
 import 'package:ilocca_v2/controllers/user_controller.dart';
 import 'package:ilocca_v2/styles/app_colors.dart';
+import 'package:ilocca_v2/utils/base_url.dart';
 import 'package:ilocca_v2/utils/sharedpreferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -22,7 +21,6 @@ TextEditingController usernameController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
 
 //to access the state we initialize the constructor
-
 UserDetailsController userDetailsController = Get.put(UserDetailsController());
 
 class LoginScreen extends StatefulWidget {
@@ -73,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        elevation: 10,
+                        elevation: 1,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: BackdropFilter(
@@ -181,7 +179,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                       alignment: Alignment.topLeft,
                                       child: TextButton(
                                         onPressed: () {
-                                          Get.offAndToNamed("/register");
+                                          Navigator.of(context)
+                                              .pushReplacementNamed(
+                                                  "/register");
                                         },
                                         child: const Text("No Account Yet"),
                                       ),
@@ -202,17 +202,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-//   login() {
-//  //we are going to store username locally in sharedPreferences
-//     //this will ensure it remembers us,
-//     //key is username and value is whatever was typed
-
-//     myPref.writeValue("username", usernameController.text).then(
-//           (value) => (Get.offAndToNamed("/main"),),
-//         );
-//     // Get.offAndToNamed("/home");
-//   }
-
   Future<void> login() async {
     var response = await loginUser();
     if (response.statusCode == 200) {
@@ -227,9 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
       userDetailsController.updateUserDetails(username, phone, userId);
 
       //we are going to store username and phone locally in sharedPreferences
-      myPref.writeValue("username", usernameController.text).then(
-            (value) => (Get.offAndToNamed("/main"),),
-          );
+      myPref.writeValue("username", usernameController.text);
 
       Navigator.of(context).pushReplacementNamed("/main");
     } else {
@@ -253,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<http.Response> loginUser() async {
-    final url = Uri.parse('http://10.0.2.2:8000/api/v1/users/login');
+    final url = Uri.parse('$base_url/users/login');
     // Prepare the body
     final body = jsonEncode({
       'username': usernameController.text,
