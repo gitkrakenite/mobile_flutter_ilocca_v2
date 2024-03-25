@@ -4,9 +4,13 @@ import 'package:ilocca_v2/components/ads_component.dart';
 import 'package:ilocca_v2/components/trending_events.dart';
 import 'package:ilocca_v2/components/user_avatar.dart';
 import 'package:ilocca_v2/controllers/app_theme.dart';
+import 'package:ilocca_v2/controllers/user_controller.dart';
 import 'package:ilocca_v2/styles/app_colors.dart';
 
 final MainAppTheme appTheme = Get.find<MainAppTheme>();
+
+//acces the userdetails state
+UserDetailsController userDetailsController = Get.put(UserDetailsController());
 
 bool isSwitch = false;
 
@@ -32,16 +36,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      "Hello John 👋",
-                      style: TextStyle(
+                    Text(
+                      "Hello ${userDetailsController.username.value.length > 8 ? userDetailsController.username.value.substring(0, 8) : userDetailsController.username.value} 👋",
+                      style: const TextStyle(
                         fontWeight: FontWeight.w900,
                         fontSize: 30,
                       ),
                     ),
                     GestureDetector(
                       onTap: () {
-                        Get.toNamed("/profile");
+                        Navigator.of(context).pushReplacementNamed("/profile");
                       },
                       child: const UserAvatar(
                         path:

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -5,9 +6,24 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:ilocca_v2/controllers/user_controller.dart';
 import 'package:ilocca_v2/styles/app_colors.dart';
+import 'package:ilocca_v2/utils/sharedpreferences.dart';
+import 'package:http/http.dart' as http;
 
 bool showPass = false;
+
+//shared preferences object
+//we have two functions. read and write
+MysharedPreferences myPref = MysharedPreferences();
+
+//controllers to track inputs on text fields
+TextEditingController usernameController = TextEditingController();
+TextEditingController passwordController = TextEditingController();
+
+//to access the state we initialize the constructor
+
+UserDetailsController userDetailsController = Get.put(UserDetailsController());
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,6 +35,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
+    //we can now read values from sharedpreferences
+    //the key must be what you had when writing
+    //since we are reading from the futre and not immediately we need .then
+    myPref.getValue("username").then(
+          (value) => {usernameController.text = value},
+        );
+
     return Scaffold(
       body: Column(
         children: [
@@ -71,6 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       height: 16,
                                     ),
                                     TextField(
+                                      controller: usernameController,
                                       decoration: InputDecoration(
                                         hintText: "username",
                                         labelText: "Please Enter Username",
@@ -89,6 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       height: 16,
                                     ),
                                     TextField(
+                                      controller: passwordController,
                                       obscureText: showPass ? false : true,
                                       decoration: InputDecoration(
                                         hintText: "password",
@@ -127,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 Size(double.infinity, 0)),
                                       ),
                                       onPressed: () {
-                                        login();
+                                        checkUserDetails();
                                       },
                                       child: const Padding(
                                         padding: const EdgeInsets.all(8.0),
@@ -177,7 +202,88 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  login() {
-    Get.offAndToNamed("/home");
+//   login() {
+//  //we are going to store username locally in sharedPreferences
+//     //this will ensure it remembers us,
+//     //key is username and value is whatever was typed
+
+//     myPref.writeValue("username", usernameController.text).then(
+//           (value) => (Get.offAndToNamed("/main"),),
+//         );
+//     // Get.offAndToNamed("/home");
+//   }
+
+  Future<void> login() async {
+    var response = await loginUser();
+    if (response.statusCode == 200) {
+      // Parse the JSON response body
+      var jsonResponse = jsonDecode(response.body);
+
+      // Extract username and phone from the JSON response
+      String username = jsonResponse['username'];
+      String phone = jsonResponse['phone'];
+      String userId = jsonResponse['user_id'].toString();
+
+      userDetailsController.updateUserDetails(username, phone, userId);
+
+      //we are going to store username and phone locally in sharedPreferences
+      myPref.writeValue("username", usernameController.text).then(
+            (value) => (Get.offAndToNamed("/main"),),
+          );
+
+      Navigator.of(context).pushReplacementNamed("/main");
+    } else {
+      print('Failed to login user. Status code: ${response.statusCode}');
+      showingDialogMsg("Login Error", "Incorrect Username or Password");
+    }
+  }
+
+  checkUserDetails() {
+    if (usernameController.text.isEmpty) {
+      showingDialogMsg("Login Error", "Username Missing");
+      return;
+    }
+
+    if (passwordController.text.isEmpty) {
+      showingDialogMsg("Login Error", "Password Missing");
+      return;
+    }
+
+    login();
+  }
+
+  Future<http.Response> loginUser() async {
+    final url = Uri.parse('http://10.0.2.2:8000/api/v1/users/login');
+    // Prepare the body
+    final body = jsonEncode({
+      'username': usernameController.text,
+      'user_pwd': passwordController.text,
+    });
+
+    // Prepare the headers
+    final headers = {'Content-Type': 'application/json'};
+
+    // Make the POST request
+    return http.post(url, headers: headers, body: body);
+  }
+
+  Future<dynamic> showingDialogMsg(String title, String msg) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(msg),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
