@@ -65,7 +65,8 @@ class TopBusinessWidget extends StatelessWidget {
                                   ),
                                   child: IconButton(
                                     onPressed: () {
-                                      Get.toNamed("/addBiz");
+                                      Navigator.of(context)
+                                          .pushReplacementNamed("/add");
                                     },
                                     icon: const Icon(
                                       Icons.add,

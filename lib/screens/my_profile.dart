@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:ilocca_v2/components/trending_events.dart';
+import 'package:ilocca_v2/controllers/user_controller.dart';
 import 'package:ilocca_v2/styles/app_colors.dart';
+import 'package:get/get.dart';
+
+//acces the userdetails state
+UserDetailsController userDetailsController = Get.put(UserDetailsController());
 
 class MyProfile extends StatelessWidget {
   const MyProfile({super.key});
@@ -61,6 +66,15 @@ class MyProfile extends StatelessWidget {
               ],
             ),
           ),
+          Align(
+            alignment: Alignment.topLeft,
+            child: TextButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed("/main");
+              },
+              child: const Text("Back"),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Column(
@@ -72,10 +86,10 @@ class MyProfile extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      "Hello Josh",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+                    Text(
+                      "Hello ${userDetailsController.username.value}",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w800, fontSize: 24),
                     ),
                     IconButton(
                       onPressed: () {
@@ -89,7 +103,7 @@ class MyProfile extends StatelessWidget {
                   height: 25,
                 ),
                 const Text(
-                  "You have three events",
+                  "You have three businesses",
                   style: TextStyle(
                       // color: secondaryTxtColor.withOpacity(0.8),
                       fontWeight: FontWeight.bold,

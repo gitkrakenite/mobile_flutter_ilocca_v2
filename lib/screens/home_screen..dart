@@ -235,23 +235,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
 //======================tREDNING EVENTS=========================
 
-                const Text(
-                  "Trending Events",
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
-                ),
+                // const Text(
+                //   "Trending Events",
+                //   style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+                // ),
 
-                const SizedBox(
-                  height: 30,
-                ),
+                // const SizedBox(
+                //   height: 30,
+                // ),
 
-                const SizedBox(
-                  height: 250,
-                  child: TrendingEvents(),
-                ),
+                // const SizedBox(
+                //   height: 250,
+                //   child: TrendingEvents(),
+                // ),
 
-                const SizedBox(
-                  height: 30,
-                ),
+                // const SizedBox(
+                //   height: 30,
+                // ),
               ],
             ),
           ],

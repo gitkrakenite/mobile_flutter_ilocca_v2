@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:ilocca_v2/controllers/user_controller.dart';
 import 'package:ilocca_v2/styles/app_colors.dart';
