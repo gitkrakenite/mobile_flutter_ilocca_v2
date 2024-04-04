@@ -88,7 +88,11 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
               const SizedBox(
                 height: 14,
               ),
-              IconButton(onPressed: () {}, icon: Icon(Icons.arrow_back)),
+              IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacementNamed("/main");
+                  },
+                  icon: Icon(Icons.arrow_back)),
               Card(
                 // margin: EdgeInsets.only(top: 100),
                 color: Colors.transparent,

@@ -55,7 +55,7 @@ class MyProfile extends StatelessWidget {
                       height: 70,
                       width: 70,
                       child: Image.network(
-                        'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400',
+                        userDetailsController.profile.value,
                         height: 60,
                         width: 60,
                         fit: BoxFit.cover,

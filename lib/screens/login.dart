@@ -9,8 +9,10 @@ import 'package:ilocca_v2/styles/app_colors.dart';
 import 'package:ilocca_v2/utils/base_url.dart';
 import 'package:ilocca_v2/utils/sharedpreferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 bool showPass = false;
+bool isLoading = false;
 
 //shared preferences object
 //we have two functions. read and write
@@ -140,41 +142,54 @@ class _LoginScreenState extends State<LoginScreen> {
                                     const SizedBox(
                                       height: 16,
                                     ),
-                                    ElevatedButton(
-                                      style: ButtonStyle(
-                                        backgroundColor: MaterialStateProperty
-                                            .all<Color>(Colors
-                                                .transparent), // Set your desired background color
-                                        minimumSize:
-                                            MaterialStateProperty.all<Size>(
-                                                Size(double.infinity, 0)),
-                                      ),
-                                      onPressed: () {
-                                        checkUserDetails();
-                                      },
-                                      child: const Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "Login Now",
-                                              style: TextStyle(
-                                                color: primaryTxtColor,
+                                    isLoading
+                                        ? Center(
+                                            child: Column(
+                                              children: [
+                                                LoadingAnimationWidget
+                                                    .newtonCradle(
+                                                        color: primaryTxtColor,
+                                                        size: 50),
+                                                const Text("Please Wait")
+                                              ],
+                                            ),
+                                          )
+                                        : ElevatedButton(
+                                            style: ButtonStyle(
+                                              backgroundColor: MaterialStateProperty
+                                                  .all<Color>(Colors
+                                                      .transparent), // Set your desired background color
+                                              minimumSize: MaterialStateProperty
+                                                  .all<Size>(
+                                                      Size(double.infinity, 0)),
+                                            ),
+                                            onPressed: () {
+                                              checkUserDetails();
+                                            },
+                                            child: const Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "Login Now",
+                                                    style: TextStyle(
+                                                      color: primaryTxtColor,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 5,
+                                                  ),
+                                                  Icon(
+                                                    Icons.login,
+                                                    color: primaryTxtColor,
+                                                  )
+                                                ],
                                               ),
                                             ),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Icon(
-                                              Icons.login,
-                                              color: primaryTxtColor,
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
+                                          ),
                                     Align(
                                       alignment: Alignment.topLeft,
                                       child: TextButton(
@@ -203,6 +218,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> login() async {
+    setState(() {
+      isLoading = true;
+    });
     var response = await loginUser();
     if (response.statusCode == 200) {
       // Parse the JSON response body
@@ -212,15 +230,30 @@ class _LoginScreenState extends State<LoginScreen> {
       String username = jsonResponse['username'];
       String phone = jsonResponse['phone'];
       String userId = jsonResponse['user_id'].toString();
+      String location = jsonResponse['location'].toString();
+      String profile = jsonResponse['profile'].toString();
 
-      userDetailsController.updateUserDetails(username, phone, userId);
+      userDetailsController.updateUserDetails(
+        username,
+        phone,
+        userId,
+        location,
+        profile,
+      );
 
       //we are going to store username and phone locally in sharedPreferences
       myPref.writeValue("username", usernameController.text);
 
+      setState(() {
+        isLoading = false;
+      });
+
       Navigator.of(context).pushReplacementNamed("/main");
     } else {
       print('Failed to login user. Status code: ${response.statusCode}');
+      setState(() {
+        isLoading = false;
+      });
       showingDialogMsg("Login Error", "Incorrect Username or Password");
     }
   }

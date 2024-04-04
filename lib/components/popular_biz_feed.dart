@@ -1,124 +1,147 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:http/http.dart' as http;
 import 'package:ilocca_v2/screens/specific_business.dart';
+import 'package:ilocca_v2/styles/app_colors.dart';
+import 'package:ilocca_v2/utils/base_url.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-var businesses = [
-  {
-    "id": "1",
-    "title": "Comrades",
-    "photo":
-        "https://images.pexels.com/photos/618079/pexels-photo-618079.jpeg?auto=compress&cs=tinysrgb&w=400",
-    "owner": "kiprop"
-  },
-  {
-    "id": "2",
-    "title": "My Business",
-    "photo":
-        "https://images.pexels.com/photos/1367269/pexels-photo-1367269.jpeg?auto=compress&cs=tinysrgb&w=400",
-    "owner": "mercy"
-  },
-  {
-    "id": "3",
-    "title": "Dacing one",
-    "photo":
-        "https://images.pexels.com/photos/1438072/pexels-photo-1438072.jpeg?auto=compress&cs=tinysrgb&w=400",
-    "owner": "kiprop"
-  },
-  {
-    "id": "4",
-    "title": "Jump 2",
-    "photo":
-        "https://images.pexels.com/photos/1438072/pexels-photo-1438072.jpeg?auto=compress&cs=tinysrgb&w=400",
-    "owner": "alexis"
-  },
-  {
-    "id": "5",
-    "title": "business 4",
-    "photo":
-        "https://images.pexels.com/photos/3184419/pexels-photo-3184419.jpeg?auto=compress&cs=tinysrgb&w=400",
-    "owner": "manu"
-  },
-];
+bool isLoading = false;
 
-class PopularBiz extends StatelessWidget {
-  const PopularBiz({super.key});
+class PopularBiz extends StatefulWidget {
+  const PopularBiz({Key? key}) : super(key: key);
+
+  @override
+  _PopularBizState createState() => _PopularBizState();
+}
+
+class _PopularBizState extends State<PopularBiz> {
+  List<Map<String, dynamic>> businesses = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchBusinesses(); // Fetch businesses when the widget initializes
+  }
+
+  void fetchBusinesses() async {
+    setState(() {
+      isLoading = true;
+    });
+    final response = await http.get(Uri.parse('$base_url/biz'));
+    if (response.statusCode == 200) {
+      List<Map<String, dynamic>> fetchedBusinesses =
+          List<Map<String, dynamic>>.from(json.decode(response.body));
+
+      // Shuffle the list of businesses
+      fetchedBusinesses.shuffle();
+
+      // Select only the top 5 businesses
+      setState(() {
+        isLoading = false;
+        businesses = fetchedBusinesses.take(5).toList();
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      throw Exception('Failed to load businesses');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return (Expanded(
-      child: ListView.builder(
-        padding: EdgeInsets.symmetric(horizontal: 14),
-        itemCount: (businesses.length / 2)
-            .ceil(), // Calculate the number of rows needed
-        itemBuilder: (context, index) {
-          int startIndex = index * 2;
-          int endIndex = (index + 1) * 2;
-          endIndex =
-              endIndex > businesses.length ? businesses.length : endIndex;
-
-          return Column(
-            children: [
-              Row(
+    return Expanded(
+      child: isLoading
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  buildBusinessItem(context, businesses[startIndex]),
-                  SizedBox(width: 16), // Adjust the spacing between items
-                  if (endIndex < businesses.length)
-                    buildBusinessItem(context, businesses[endIndex]),
+                  LoadingAnimationWidget.halfTriangleDot(
+                      color: primaryTxtColor, size: 50),
+                  const Text("Fetching ...")
                 ],
               ),
-            ],
+            )
+          : ListView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 14),
+              itemCount: (businesses.length / 2).ceil(),
+              itemBuilder: (context, index) {
+                int startIndex = index * 2;
+                int endIndex = min((index + 1) * 2, businesses.length);
+                return buildBusinessRow(context, startIndex, endIndex);
+              },
+            ),
+    );
+  }
+
+  Widget buildBusinessRow(BuildContext context, int startIndex, int endIndex) {
+    return Row(
+      children: [
+        buildBusinessItem(context, businesses[startIndex]),
+        const SizedBox(
+          width: 10,
+        ),
+        if (endIndex - startIndex == 2)
+          buildBusinessItem(context, businesses[startIndex + 1]),
+      ],
+    );
+  }
+
+  Widget buildBusinessItem(
+      BuildContext context, Map<String, dynamic> business) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SpecificBusiness(
+                title: business["title"].toString(),
+                photo: business["photo"].toString(),
+                owner: business["business_owner"].toString(),
+                business_desc: business["business_desc"].toString(),
+                business_location: business["business_location"].toString(),
+                category: business["category"].toString(),
+                phone: business["phone"].toString(),
+                business_id: business["business_id"].toString(),
+              ),
+            ),
           );
         },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.network(
+                "${business["photo"]}",
+                width: 300,
+                height: 200,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "${business["title"]}",
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              "Owner: ${business["business_owner"]}",
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            const SizedBox(height: 30),
+          ],
+        ),
       ),
-    ));
+    );
   }
-}
-
-Widget buildBusinessItem(BuildContext context, Map<String, String> business) {
-  return Expanded(
-    child: GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SpecificBusiness(
-              title: business["title"]!,
-              photo: business["photo"]!,
-              owner: business["owner"]!,
-            ),
-          ),
-        );
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Image.network(
-              "${business["photo"]}",
-              width: 300,
-              height: 200,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            "${business["title"]}",
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          Text(
-            "Owner: ${business["owner"]}",
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(height: 30),
-        ],
-      ),
-    ),
-  );
 }

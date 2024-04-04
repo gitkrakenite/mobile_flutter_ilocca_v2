@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,8 +8,14 @@ import 'package:ilocca_v2/styles/app_colors.dart';
 import 'package:http/http.dart' as http;
 import 'package:ilocca_v2/utils/base_url.dart';
 import 'package:ilocca_v2/utils/sharedpreferences.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:cloudinary_public/cloudinary_public.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 bool showPass = false;
+String locationValue = 'default';
+String photoValue = "";
+bool isLoading = false;
 
 //shared preferences object
 //we have two functions. read and write
@@ -30,6 +37,46 @@ class RegisterSceen extends StatefulWidget {
 }
 
 class _RegisterSceenState extends State<RegisterSceen> {
+  File? _image;
+  CloudinaryPublic cloudinary =
+      CloudinaryPublic('ddyw2aavm', 'flutterilocca', cache: false);
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedImage = await ImagePicker().pickImage(source: source);
+
+    setState(() {
+      _image = pickedImage != null ? File(pickedImage.path) : null;
+    });
+
+    if (_image != null) {
+      _uploadImageToCloudinary();
+    }
+  }
+
+  Future<void> _uploadImageToCloudinary() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      final response = await cloudinary.uploadFile(
+        CloudinaryFile.fromFile(_image!.path,
+            resourceType: CloudinaryResourceType.Image),
+      );
+      // Handle the response here
+      print("Uploaded image URL: ${response.secureUrl}");
+      setState(() {
+        isLoading = false;
+      });
+      photoValue = response.secureUrl;
+    } catch (e) {
+      // Handle upload errors
+      setState(() {
+        isLoading = false;
+      });
+      print("Error uploading image: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,6 +174,95 @@ class _RegisterSceenState extends State<RegisterSceen> {
                                               ),
                                             ),
                                           ),
+
+                                          const SizedBox(
+                                            height: 16,
+                                          ),
+
+                                          //drop down for location
+                                          Container(
+                                            width:
+                                                double.infinity, // Full width
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(12.0),
+                                            ),
+                                            child: DropdownButton(
+                                              padding:
+                                                  const EdgeInsets.all(6.0),
+                                              isExpanded: true,
+                                              value: locationValue,
+                                              icon: const Icon(
+                                                  Icons.arrow_drop_down),
+                                              underline: Container(),
+                                              // style: TextStyle(color: Colors.white),
+                                              borderRadius:
+                                                  BorderRadius.circular(12.0),
+                                              elevation: 16,
+                                              // dropdownColor: Colors.black.withOpacity(0.8),
+                                              onChanged: (String? newValue) {
+                                                setState(() {
+                                                  locationValue = newValue!;
+                                                });
+                                              },
+                                              items: const [
+                                                DropdownMenuItem(
+                                                  value: "default",
+                                                  child:
+                                                      Text("Choose location"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: "daystar",
+                                                  child: Text("Daystar Athi"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: "kitengela",
+                                                  child: Text("Kitengela"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: "syokimau",
+                                                  child: Text("Syokimau"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: "thika",
+                                                  child: Text("Thika"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: "other",
+                                                  child: Text("Other"),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                          const SizedBox(
+                                            height: 16,
+                                          ),
+                                          // Image picker button
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              _showImagePickerDialog();
+                                            },
+                                            child: Text("Pick Profile"),
+                                          ),
+
+                                          /// Display selected image
+
+                                          isLoading
+                                              ? Center(
+                                                  child: LoadingAnimationWidget
+                                                      .staggeredDotsWave(
+                                                          color:
+                                                              primaryTxtColor,
+                                                          size: 50),
+                                                )
+                                              : _image != null
+                                                  ? Image.file(
+                                                      _image!,
+                                                      height: 100,
+                                                      width: 100,
+                                                    )
+                                                  : Container(),
                                           const SizedBox(
                                             height: 16,
                                           ),
@@ -163,42 +299,62 @@ class _RegisterSceenState extends State<RegisterSceen> {
                                           const SizedBox(
                                             height: 16,
                                           ),
-                                          ElevatedButton(
-                                            style: ButtonStyle(
-                                              backgroundColor: MaterialStateProperty
-                                                  .all<Color>(Colors
-                                                      .transparent), // Set your desired background color
-                                              minimumSize: MaterialStateProperty
-                                                  .all<Size>(
-                                                      Size(double.infinity, 0)),
-                                            ),
-                                            onPressed: () {
-                                              checkUserDetails();
-                                            },
-                                            child: const Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    "Create Account",
-                                                    style: TextStyle(
-                                                      color: primaryTxtColor,
+                                          isLoading
+                                              ? Center(
+                                                  child: Column(
+                                                    children: [
+                                                      LoadingAnimationWidget
+                                                          .newtonCradle(
+                                                              color:
+                                                                  primaryTxtColor,
+                                                              size: 50),
+                                                      const Text("Please Wait")
+                                                    ],
+                                                  ),
+                                                )
+                                              : ElevatedButton(
+                                                  style: ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStateProperty
+                                                            .all<Color>(Colors
+                                                                .transparent), // Set your desired background color
+                                                    minimumSize:
+                                                        MaterialStateProperty
+                                                            .all<Size>(Size(
+                                                                double.infinity,
+                                                                0)),
+                                                  ),
+                                                  onPressed: () {
+                                                    checkUserDetails();
+                                                  },
+                                                  child: const Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Text(
+                                                          "Create Account",
+                                                          style: TextStyle(
+                                                            color:
+                                                                primaryTxtColor,
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          width: 5,
+                                                        ),
+                                                        Icon(
+                                                          Icons.login,
+                                                          color:
+                                                              primaryTxtColor,
+                                                        )
+                                                      ],
                                                     ),
                                                   ),
-                                                  SizedBox(
-                                                    width: 5,
-                                                  ),
-                                                  Icon(
-                                                    Icons.login,
-                                                    color: primaryTxtColor,
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
+                                                ),
                                           Align(
                                             alignment: Alignment.topLeft,
                                             child: TextButton(
@@ -229,13 +385,49 @@ class _RegisterSceenState extends State<RegisterSceen> {
     );
   }
 
+  Future<void> _showImagePickerDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Select Image Source"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _pickImage(ImageSource.camera);
+              },
+              child: Text("Camera"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _pickImage(ImageSource.gallery);
+              },
+              child: Text("Gallery"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> createAccount() async {
+    setState(() {
+      isLoading = true;
+    });
     var response = await createUser();
     if (response.statusCode == 200) {
       //we are going to store username locally in sharedPreferences
       myPref.writeValue("username", usernameController.text);
+      setState(() {
+        isLoading = false;
+      });
       Navigator.of(context).pushReplacementNamed("/");
     } else {
+      setState(() {
+        isLoading = false;
+      });
       print('Failed to register user. Status code: ${response.statusCode}');
       showingDialogMsg("Registration Error Error", "Error creating account");
     }
@@ -257,6 +449,16 @@ class _RegisterSceenState extends State<RegisterSceen> {
       return;
     }
 
+    if (locationValue.isEmpty) {
+      showingDialogMsg("Registration Error", "Location Missing");
+      return;
+    }
+
+    if (photoValue.isEmpty) {
+      showingDialogMsg("Registration Error", "Photo Missing");
+      return;
+    }
+
     createAccount();
   }
 
@@ -267,12 +469,15 @@ class _RegisterSceenState extends State<RegisterSceen> {
       'username': usernameController.text,
       'phone': phoneController.text,
       'user_pwd': passwordController.text,
+      'location': locationValue,
+      'profile': photoValue
     });
 
     // Prepare the headers
     final headers = {'Content-Type': 'application/json'};
 
     // Make the POST request
+
     return http.post(url, headers: headers, body: body);
   }
 

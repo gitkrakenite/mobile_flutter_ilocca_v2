@@ -22,7 +22,7 @@ class BusinessScreen extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.only(left: 10),
               child: Text(
-                "Popular",
+                "Newest",
                 style: TextStyle(
                   fontFamily: "Poppins",
                   fontWeight: FontWeight.w800,

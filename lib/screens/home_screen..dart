@@ -47,9 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () {
                         Navigator.of(context).pushReplacementNamed("/profile");
                       },
-                      child: const UserAvatar(
-                        path:
-                            "https://images.pexels.com/photos/39866/entrepreneur-startup-start-up-man-39866.jpeg?auto=compress&cs=tinysrgb&w=400",
+                      child: UserAvatar(
+                        path: userDetailsController.profile.value,
                         size: 50,
                       ),
                     )

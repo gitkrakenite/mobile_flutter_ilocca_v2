@@ -1,5 +1,6 @@
 import 'package:ilocca_v2/screens/add_biz_screen.dart';
 import 'package:ilocca_v2/screens/all_businesses.dart';
+import 'package:ilocca_v2/screens/edit_biz_screen.dart';
 import 'package:ilocca_v2/screens/login.dart';
 import 'package:ilocca_v2/screens/main_wrapper.dart';
 import 'package:ilocca_v2/screens/my_profile.dart';
@@ -13,6 +14,7 @@ class AppRoutes {
     register: (context) => const RegisterSceen(),
     addBiz: (context) => const AddNewBusiness(),
     allBiz: (context) => const AllBusinesses(),
+    editBiz: (context) => EditMyBusinnes(),
   };
 
   static const login = '/';
@@ -20,6 +22,7 @@ class AppRoutes {
   static const main = '/main';
   static const addBiz = '/add';
   static const allBiz = '/allbiz';
+  static const editBiz = '/editbiz';
   static const editProfile = '/profile';
   static const user = '/user';
 }
