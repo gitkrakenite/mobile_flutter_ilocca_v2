@@ -9,12 +9,15 @@ import 'package:ilocca_v2/utils/base_url.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:http/http.dart' as http;
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 String dropdownValue = 'default';
 
 String locationValue = 'default';
 
 String photoValue = "";
+
+bool isLoading = false;
 
 //controllers to track inputs on text fields
 TextEditingController bizTitleController = TextEditingController();
@@ -35,7 +38,6 @@ class AddNewBusiness extends StatefulWidget {
 
 class _AddNewBusinessState extends State<AddNewBusiness> {
   File? _image;
-
   CloudinaryPublic cloudinary =
       CloudinaryPublic('ddyw2aavm', 'flutterilocca', cache: false);
 
@@ -53,15 +55,24 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
 
   Future<void> _uploadImageToCloudinary() async {
     try {
+      setState(() {
+        isLoading = true;
+      });
       final response = await cloudinary.uploadFile(
         CloudinaryFile.fromFile(_image!.path,
             resourceType: CloudinaryResourceType.Image),
       );
       // Handle the response here
       print("Uploaded image URL: ${response.secureUrl}");
+      setState(() {
+        isLoading = false;
+      });
       photoValue = response.secureUrl;
     } catch (e) {
       // Handle upload errors
+      setState(() {
+        isLoading = false;
+      });
       print("Error uploading image: $e");
     }
   }
@@ -203,13 +214,19 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
                         ),
 
                         /// Display selected image
-                        _image != null
-                            ? Image.file(
-                                _image!,
-                                height: 100,
-                                width: 100,
+
+                        isLoading
+                            ? Center(
+                                child: LoadingAnimationWidget.staggeredDotsWave(
+                                    color: primaryTxtColor, size: 50),
                               )
-                            : Container(),
+                            : _image != null
+                                ? Image.file(
+                                    _image!,
+                                    height: 100,
+                                    width: 100,
+                                  )
+                                : Container(),
 
                         const SizedBox(
                           height: 16,
@@ -269,37 +286,48 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
                           height: 16,
                         ),
 
-                        ElevatedButton(
-                          style: ButtonStyle(
-                            // backgroundColor: MaterialStateProperty.all<Color>(Colors
-                            //     .transparent), // Set your desired background color
-                            minimumSize: MaterialStateProperty.all<Size>(
-                                Size(double.infinity, 0)),
-                          ),
-                          onPressed: () {
-                            checkAllDetails();
-                          },
-                          child: const Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Add New Business",
-                                  style: TextStyle(
-                                      color: primaryTxtColor, fontSize: 20),
+                        isLoading
+                            ? Center(
+                                child: Column(
+                                  children: [
+                                    LoadingAnimationWidget.newtonCradle(
+                                        color: primaryTxtColor, size: 50),
+                                    const Text("Please wait")
+                                  ],
                                 ),
-                                SizedBox(
-                                  width: 5,
+                              )
+                            : ElevatedButton(
+                                style: ButtonStyle(
+                                  // backgroundColor: MaterialStateProperty.all<Color>(Colors
+                                  //     .transparent), // Set your desired background color
+                                  minimumSize: MaterialStateProperty.all<Size>(
+                                      Size(double.infinity, 0)),
                                 ),
-                                Icon(
-                                  Icons.add,
-                                  color: primaryTxtColor,
-                                )
-                              ],
-                            ),
-                          ),
-                        )
+                                onPressed: () {
+                                  checkAllDetails();
+                                },
+                                child: const Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Add New Business",
+                                        style: TextStyle(
+                                            color: primaryTxtColor,
+                                            fontSize: 20),
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Icon(
+                                        Icons.add,
+                                        color: primaryTxtColor,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
                       ],
                     ),
                   ),
@@ -347,11 +375,20 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
   }
 
   Future<void> handleCreate() async {
+    setState(() {
+      isLoading = true;
+    });
     var response = await addNewBiz();
     if (response.statusCode == 200) {
+      setState(() {
+        isLoading = false;
+      });
+      Navigator.of(context).pushReplacementNamed("/allbiz");
       showingDialogMsg("Creation Success 🎉", "Added New");
-      // Navigator.of(context).pushReplacementNamed("/");
     } else {
+      setState(() {
+        isLoading = false;
+      });
       print('Failed to add. Status code: ${response.statusCode}');
       showingDialogMsg("Addition Error", "Error adding biz");
     }
@@ -372,8 +409,6 @@ class _AddNewBusinessState extends State<AddNewBusiness> {
 
     // Prepare the headers
     final headers = {'Content-Type': 'application/json'};
-
-    print(body);
 
     // Make the POST request
     return http.post(url, headers: headers, body: body);
