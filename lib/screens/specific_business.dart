@@ -1,3 +1,4 @@
+import 'package:easy_url_launcher/easy_url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ilocca_v2/controllers/business_edit_controller.dart';
@@ -7,6 +8,7 @@ import 'package:ilocca_v2/styles/app_colors.dart';
 import 'package:http/http.dart' as http;
 import 'package:ilocca_v2/utils/base_url.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 //acces the userdetails state
 UserDetailsController userDetailsController = Get.put(UserDetailsController());
@@ -92,9 +94,14 @@ class _SpecificBusinessState extends State<SpecificBusiness> {
               children: [
                 Row(
                   children: [
-                    const Icon(
-                      Icons.phone,
-                      color: primaryTxtColor,
+                    IconButton(
+                      onPressed: () async {
+                        await EasyLauncher.call(number: widget.phone);
+                      },
+                      icon: const Icon(
+                        Icons.phone,
+                        color: primaryTxtColor,
+                      ),
                     ),
                     const SizedBox(width: 10),
                     Text(widget.phone),
@@ -147,7 +154,7 @@ class _SpecificBusinessState extends State<SpecificBusiness> {
                         )
                       ],
                     ) // Replace 'assets/admin_image.png' with the path to your admin image asset
-                  : Text("user"),
+                  : Container(),
             ),
           ],
         ),

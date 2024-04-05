@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ilocca_v2/components/ads_component.dart';
-import 'package:ilocca_v2/components/trending_events.dart';
+import 'package:ilocca_v2/components/my_businesses.dart';
 import 'package:ilocca_v2/components/user_avatar.dart';
 import 'package:ilocca_v2/controllers/app_theme.dart';
 import 'package:ilocca_v2/controllers/user_controller.dart';

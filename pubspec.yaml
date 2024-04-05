@@ -37,6 +37,8 @@ dependencies:
   http: ^1.2.1
   cloudinary_public: ^0.23.1
   loading_animation_widget: ^1.2.1
+  url_launcher: ^6.2.5
+  easy_url_launcher: ^0.0.6
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

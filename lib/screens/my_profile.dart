@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ilocca_v2/components/trending_events.dart';
+import 'package:ilocca_v2/components/my_businesses.dart';
 import 'package:ilocca_v2/controllers/user_controller.dart';
 import 'package:ilocca_v2/styles/app_colors.dart';
 import 'package:get/get.dart';
@@ -103,7 +103,7 @@ class MyProfile extends StatelessWidget {
                   height: 25,
                 ),
                 const Text(
-                  "You have three businesses",
+                  "Your businesses",
                   style: TextStyle(
                       // color: secondaryTxtColor.withOpacity(0.8),
                       fontWeight: FontWeight.bold,
@@ -114,7 +114,7 @@ class MyProfile extends StatelessWidget {
                 ),
                 Container(
                   height: 250,
-                  child: TrendingEvents(),
+                  child: AllMyBusinesses(),
                 )
               ],
             ),
