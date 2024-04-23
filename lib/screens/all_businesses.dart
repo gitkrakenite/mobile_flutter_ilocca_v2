@@ -38,7 +38,7 @@ class _AllBusinessesState extends State<AllBusinesses> {
         isLoading = false;
         businesses =
             List<Map<String, dynamic>>.from(json.decode(response.body));
-        print(businesses);
+        // print(businesses);
         filteredBusinesses = List.from(businesses);
       });
     } else {

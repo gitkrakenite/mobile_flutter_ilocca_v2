@@ -71,6 +71,7 @@ class MyProfile extends StatelessWidget {
             child: TextButton(
               onPressed: () {
                 Navigator.of(context).pushReplacementNamed("/main");
+                print("hello");
               },
               child: const Text("Back"),
             ),
@@ -93,7 +94,7 @@ class MyProfile extends StatelessWidget {
                     ),
                     IconButton(
                       onPressed: () {
-                        // Navigator.pushNamed(context, "/edit-profile");
+                        Navigator.pushNamed(context, "/edituser");
                       },
                       icon: const Icon(Icons.edit, color: primaryTxtColor),
                     )
